@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MoreApp</title>
+    <script type="text/javascript" src="/js/flexible_css.js"></script>
+    <script type="text/javascript" src="/js/flexible.js"></script>
+    <script type="text/javascript">
+        //动态加载css/js
+        var dynamicLoading = {
+            css: function(path){
+                if(!path || path.length === 0){
+                    throw new Error('argument "path" is required !');
+                }
+                var head = document.getElementsByTagName('head')[0];
+                var link = document.createElement('link');
+                link.href = path;
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                head.appendChild(link);
+            }
+        }
+        //根据安卓系统版本加载CSS/JS
+        var userAgent = navigator.userAgent;
+        var index = userAgent.indexOf("Android")
+        if(index >= 0){
+            var androidVersion = parseInt(userAgent.slice(index+8,index+11)*100);
+            if(androidVersion < 440){
+                dynamicLoading.css("/css/list4.4.css");
+            }else{
+                dynamicLoading.css("/css/list.css");
+            }
+        }else{
+            dynamicLoading.css("/css/list.css");
+        }
+
+    </script>
+</head>
+<body>
+<div class="box">
+    <ul>
+
+    </ul>
+</div>
+
+<script type="text/javascript" src="/js/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="/js/jquery.lazyload.js"></script>
+<script type="text/javascript">
+
+    var datajson = {
+        "homeworkout": ["Home Workout - No Equipment","Easy bodybuilding at home - no equipment needed.","homeworkout.homeworkouts.noequipment.noequipment"] ,
+        "videoconverter": ["Mp3 Video Converter","Easy CONVERT video to mp3","videotomp3converter.mp3videoconverter.videotomp3"],
+    }
+
+
+    function getandroidhtml(obj){
+        var arrappname = Object.keys(obj);
+        var lihtml = '';
+        for (var i = 0; i < arrappname.length; i++) {
+			if($id.trim() === datajson[arrappname[i]][2].trim()){
+
+			}else{
+				lihtml += "<li><a class='cover' data-appname='"+arrappname[i]+"' href='https://play.google.com/store/apps/details?id="+datajson[arrappname[i]][2]+"'><img class='lazy' data-original='/image/"+arrappname[i]+".jpg'><div class='content'></span><span class='btn'>INSTALL</span></div></a></li>";
+			}
+        }
+        $("ul").append(lihtml);
+        $("img.lazy").lazyload({effect: "fadeIn"});
+    }
+
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    };
+
+    $id = getQueryString("id");
+    $lang = getQueryString("lang");
+    $pkg = getQueryString("pkg");
+
+    console.log($pkg);
+
+    //android方法
+    // if ($id == 1) {
+    //     getandroid();
+
+    // }else{
+        getandroidhtml(datajson);
+    // }
+
+
+    function getandroid(){
+        window.opreation.getandroid('getAddata',JSON.stringify(datajson));
+    }
+
+    function getAddata(response){
+        var arrappname = Object.keys(response);
+        var userapp = Object.keys(datajson);
+        var lihtml = '';
+        for (var i = 0; i < arrappname.length; i++) {
+            for (var j = 0; j < userapp.length; j++) {
+                if (arrappname[i] == userapp[j]) {
+
+                    if (response[arrappname[i]] == "true" ) {
+						lihtml += "<li><a onclick='return false;' class='cover' data-appname='"+arrappname[i]+"' href='https://play.google.com/store/apps/details?id="+datajson[arrappname[i]][2]+"'><img class='lazy' data-original='/image/"+arrappname[i]+".jpg'><div class='content'></span><span class='btn'>INSTALL</span></div></a></li>";
+                        <!-- lihtml += "<li><a onclick='return false;' class='cover' data-appname='"+arrappname[i]+"' href='https://play.google.com/store/apps/details?id="+datajson[arrappname[i]][2]+"'><img class='lazy' data-original='/image/"+arrappname[i]+".jpg'><div class='content'></span><span class='btn'>INSTALL</span></div></a></li>"; -->
+                    }
+                }
+            }
+        }
+        $("ul").append(lihtml);
+        $("img.lazy").lazyload({effect: "fadeIn"});
+    }
+
+    $('.box').on('click','li a',function(){
+        var appname = $(this).attr("data-appname");
+        var src = $(this).attr("href");
+        gtag('event', '安卓点击数据', {
+            'event_category' : 'pkg='+$pkg,
+            'event_label' : appname
+        });
+        window.opreation.geturl(src);
+    });
+
+
+
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111856931-1"></script> -->
+<!-- <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-111856931-1');
+</script> -->
+</body>
+</html>
